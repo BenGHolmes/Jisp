@@ -1,4 +1,4 @@
-package parser;
+package tokens;
 
 public class TokenInt extends Token {
     public final int value;

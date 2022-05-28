@@ -1,6 +1,7 @@
 package parser;
 
-import java.text.ParseException;
+import tokens.*;
+
 import java.util.*;
 
 public class Parser {

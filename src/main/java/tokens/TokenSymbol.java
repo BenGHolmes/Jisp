@@ -1,4 +1,4 @@
-package parser;
+package tokens;
 
 public class TokenSymbol extends Token {
     public final String value;

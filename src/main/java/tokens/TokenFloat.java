@@ -1,4 +1,4 @@
-package parser;
+package tokens;
 
 public class TokenFloat extends Token {
     public final float value;
