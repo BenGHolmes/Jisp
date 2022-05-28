@@ -22,7 +22,9 @@ public class Jisp {
                 String input = scanner.nextLine();
                 System.out.println(input);
             } catch (Exception e) {
-                System.out.println(e.getMessage());
+                // Print stack trace and rest the scanner
+                e.printStackTrace();
+                scanner = new Scanner(System.in);
             }
         }
     }
