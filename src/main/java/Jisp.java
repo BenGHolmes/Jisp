@@ -22,15 +22,17 @@ public class Jisp {
             try {
                 // Read next line of input
                 String input = scanner.nextLine();
-                Parser.parse(input);
-
-                // Echo for now. TODO: Parse and execute
-                System.out.println(input);
+                Token token = Parser.parse(input);
+                printToken(token);
             } catch (Exception e) {
                 // Print stack trace and reset the scanner in case it's stuck in a weird state
                 e.printStackTrace();
                 scanner = new Scanner(System.in);
             }
         }
+    }
+
+    private static void printToken(Token token) {
+        System.out.println(token.toString());
     }
 }
