@@ -1,10 +1,15 @@
+package parser;
+
 import java.util.*;
 
 public class Parser {
     /** Parse a Lisp string into nested arrays of tokens **/
     public static List<String> parse(String s) {
         Deque<String> tokens = tokenize(s);
-        System.out.println(tokens.pop());
+        int i=1;
+        while(!tokens.isEmpty()) {
+            System.out.printf("%d: %s\n", i++, tokens.pop());
+        }
 
         return new ArrayList<>();
     }
@@ -13,6 +18,7 @@ public class Parser {
         return new ArrayDeque<String>(Arrays.asList(
                 s.replace("(", " ( ")
                         .replace(")", " ) ")
+                        .trim()
                         .split(" ")
                 ));
     }
