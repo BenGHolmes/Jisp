@@ -72,6 +72,8 @@ public class Environment {
             case "cond" -> evalCond(tokenList);
             case "null?" -> evalNull(tokenList);
             case "if" -> evalIf(tokenList);
+            case "set!" -> evalSet(tokenList);
+            case "define" -> evalDefine(tokenList);
             default -> new TokenError("unrecognized command: " + op);
         };
     }
@@ -157,5 +159,26 @@ public class Environment {
         } else {
             return eval(tokenList.get(3));
         }
+    }
+
+    private Token evalSet(TokenList tokenList) {
+        String var = tokenList.second().toString();
+        Token val = eval(tokenList.get(2));
+
+        if (find(var) instanceof TokenError) {
+            return new TokenError("attempted to set undefined variable: " + var);
+        }
+
+        // FIXME: Must be able to update variables in parent env too
+        env.put(var, val);
+        return val;
+    }
+
+    private Token evalDefine(TokenList tokenList) {
+        String var = tokenList.second().toString();
+        Token val = eval(tokenList.get(2));
+
+        env.put(var, val);
+        return val;
     }
 }
