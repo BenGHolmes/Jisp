@@ -71,6 +71,7 @@ public class Environment {
             case "cons" -> evalCons(tokenList);
             case "cond" -> evalCond(tokenList);
             case "null?" -> evalNull(tokenList);
+            case "if" -> evalIf(tokenList);
             default -> new TokenError("unrecognized command: " + op);
         };
     }
@@ -146,5 +147,15 @@ public class Environment {
         Token res = eval(tokenList.second());
         boolean isNull = (res instanceof TokenList) && (((TokenList) res).list.size() == 0);
         return new TokenBool(isNull);
+    }
+
+    private Token evalIf(TokenList tokenList) {
+        TokenBool tokenTrue = new TokenBool(true);
+        Token cond = eval(tokenList.second());
+        if (cond.equals(tokenTrue)) {
+            return eval(tokenList.get(2));
+        } else {
+            return eval(tokenList.get(3));
+        }
     }
 }
