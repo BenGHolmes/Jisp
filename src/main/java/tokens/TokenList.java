@@ -10,13 +10,18 @@ public class TokenList extends Token {
     }
 
     public String toString() {
-        StringBuilder out = new StringBuilder("[ ");
+        StringBuilder out = new StringBuilder("(");
         for (Token t : list) {
             out.append(t.toString());
             out.append(" ");
         }
 
-        out.append("]");
+        if (list.size() != 0) {
+            out.setCharAt(out.length()-1, ')');
+        } else {
+            out.append(")");
+        }
+
         return out.toString();
     }
 
@@ -32,7 +37,7 @@ public class TokenList extends Token {
         return list.get(1);
     }
 
-    public Token tail() {
+    public TokenList tail() {
         List<Token> tail = list.subList(1, list.size());
         return new TokenList(tail);
     }

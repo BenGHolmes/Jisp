@@ -3,6 +3,7 @@ package environment;
 import tokens.*;
 
 import java.util.HashMap;
+import java.util.List;
 
 public class Environment {
     private HashMap<String, Token> env;
@@ -32,18 +33,24 @@ public class Environment {
         env.put(name, token);
     }
 
-    public Token find(String name) throws EnvNotFoundException {
+    public Token find(String name) {
+        // Check this env
         Token res = env.get(name);
-        if (res == null && parent != null) {res = parent.find(name);}
+
+        // If not found, check parent env
+        if (res == null && parent != null) {
+            res = parent.find(name);
+        }
+
+        // If not found, return error
         if (res == null) {
-            String message  = "couldn't find variable: " + name;
-            throw new EnvNotFoundException(message);
+            res = new TokenError("couldn't find variable: " + name);
         }
 
         return res;
     }
 
-    public Token eval(Token token) throws EnvNotFoundException {
+    public Token eval(Token token) {
         if (token instanceof TokenSymbol) {
             // Variable reference
             return this.find(((TokenSymbol) token).value);
@@ -55,18 +62,89 @@ public class Environment {
         // Must be a list at this point
         TokenList tokenList = (TokenList) token;
         String op = tokenList.first().toString();
-        if (op.equals("quote") || op.equals("q")) {
-            return tokenList.second();
-        } else if (op.equals("atom?")) {
-            Token res = eval(tokenList.second());
-            return new TokenBool(!(res instanceof TokenList));
-        } else if (op.equals("eq?")) {
-            Token v1 = eval(tokenList.get(1));
-            Token v2 = eval(tokenList.get(2));
-            boolean equal = !(v1 instanceof TokenList) && v1.equals(v2);
-            return new TokenBool(equal);
+        return switch (op) {
+            case "quote", "q" -> evalQuote(tokenList);
+            case "atom?" -> evalAtom(tokenList);
+            case "eq?" -> evalEq(tokenList);
+            case "car" -> evalCar(tokenList);
+            case "cdr" -> evalCdr(tokenList);
+            case "cons" -> evalCons(tokenList);
+            case "cond" -> evalCond(tokenList);
+            case "null?" -> evalNull(tokenList);
+            default -> new TokenError("unrecognized command: " + op);
+        };
+    }
+
+    private Token evalQuote(TokenList tokenList) {
+        return tokenList.second();
+    }
+
+    private Token evalAtom(TokenList tokenList) {
+        Token res = eval(tokenList.second());
+        return new TokenBool(!(res instanceof TokenList));
+    }
+
+    private Token evalEq(TokenList tokenList) {
+        Token v1 = eval(tokenList.get(1));
+        Token v2 = eval(tokenList.get(2));
+        boolean equal = !(v1 instanceof TokenList) && v1.equals(v2);
+        return new TokenBool(equal);
+    }
+
+    private Token evalCar(TokenList tokenList) {
+        Token res = eval(tokenList.second());
+        if (res instanceof TokenList) {
+            TokenList resList = (TokenList) res;
+            if (resList.list.size() < 1) return new TokenError("attempted to get first element of empty list");
+            else return resList.first();
+        } else {
+            return new TokenError("attempted to get first element of atomic");
+        }
+    }
+
+    private Token evalCdr(TokenList tokenList) {
+        Token res = eval(tokenList.second());
+        if (res instanceof TokenList) {
+            TokenList resList = (TokenList) res;
+            if (resList.list.size() < 1) return new TokenError("attempted to get first element of empty list");
+            else return resList.tail();
+        } else {
+            return new TokenError("attempted to get first element of atomic");
+        }
+    }
+
+    private Token evalCons(TokenList tokenList) {
+        Token v1 = eval(tokenList.get(1));
+        Token v2 = eval(tokenList.get(2));
+        if (! (v2 instanceof TokenList)) {
+            return new TokenError("exp2 in (cons exp1 exp2) must evaluate to a list");
         }
 
-        return new TokenSymbol("Not implemented yet :)");
+        List<Token> tokens = ((TokenList) v2).list;
+        tokens.add(0, v1);
+
+        return new TokenList(tokens);
+    }
+
+    private Token evalCond(TokenList tokenList) {
+        TokenBool tokenTrue = new TokenBool(true);
+        for (Token em : tokenList.tail().list) {
+            if (! (em instanceof TokenList)) return new TokenError("invalid use of (cond (p1 e1) ... (pn en))");
+            TokenList emList = (TokenList) em;
+            Token p = emList.first();
+            Token e = emList.second();
+
+            if (eval(p).equals(tokenTrue)) {
+                return eval(e);
+            }
+        }
+
+        return new TokenError("no branch of cond evaluated to true");
+    }
+
+    private Token evalNull(TokenList tokenList) {
+        Token res = eval(tokenList.second());
+        boolean isNull = (res instanceof TokenList) && (((TokenList) res).list.size() == 0);
+        return new TokenBool(isNull);
     }
 }

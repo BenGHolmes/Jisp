@@ -1,6 +1,7 @@
 import environment.*;
 import parser.*;
 import tokens.Token;
+import tokens.TokenBool;
 
 import java.util.Scanner;
 
@@ -42,7 +43,8 @@ public class Jisp {
 
     private static Environment createGlobalEnv() {
         Environment env = new Environment();
-
+        env.assign("True", new TokenBool(true));
+        env.assign("False", new TokenBool(false));
         return env;
     }
 }
