@@ -1,3 +1,4 @@
+import environment.*;
 import parser.*;
 import tokens.Token;
 
@@ -17,6 +18,7 @@ public class Jisp {
     /** Infinite prompt-read-eval-print loop for the interpreter. **/
     private static void promptLoop() {
         Scanner scanner = new Scanner(System.in);
+        Environment global = createGlobalEnv();
 
         while (true) {
             System.out.print("jisp> ");
@@ -25,6 +27,8 @@ public class Jisp {
                 String input = scanner.nextLine();
                 Token token = Parser.parse(input);
                 printToken(token);
+                Token result = global.eval(token);
+                printToken(result);
             } catch (Exception e) {
                 // Print stack trace and reset the scanner in case it's stuck in a weird state
                 e.printStackTrace();
@@ -35,5 +39,11 @@ public class Jisp {
 
     private static void printToken(Token token) {
         System.out.println(token.toString());
+    }
+
+    private static Environment createGlobalEnv() {
+        Environment env = new Environment();
+
+        return env;
     }
 }

@@ -19,4 +19,17 @@ public class TokenList extends Token {
         out.append("]");
         return out.toString();
     }
+
+    public Token first() {
+        return list.get(0);
+    }
+
+    public Token second() {
+        return list.get(1);
+    }
+
+    public Token tail() {
+        List<Token> tail = list.subList(1, list.size());
+        return new TokenList(tail);
+    }
 }

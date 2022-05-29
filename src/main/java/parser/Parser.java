@@ -11,6 +11,10 @@ public class Parser {
         return buildTree(tokens);
     }
 
+    /*
+    (atom? (q (1 2 3)))
+     */
+
     /** Split an input string into a list of individual tokens **/
     private static Deque<String> tokenize(String s) {
         return new ArrayDeque<String>(Arrays.asList(
