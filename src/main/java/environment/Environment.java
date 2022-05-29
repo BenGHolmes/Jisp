@@ -44,8 +44,6 @@ public class Environment {
     }
 
     public Token eval(Token token) throws EnvNotFoundException {
-        System.out.printf("INPUT: %s\n", token.toString());
-
         if (token instanceof TokenSymbol) {
             // Variable reference
             return this.find(((TokenSymbol) token).value);
@@ -57,12 +55,16 @@ public class Environment {
         // Must be a list at this point
         TokenList tokenList = (TokenList) token;
         String op = tokenList.first().toString();
-        System.out.printf("OP: %s\n", op);
         if (op.equals("quote") || op.equals("q")) {
             return tokenList.second();
         } else if (op.equals("atom?")) {
             Token res = eval(tokenList.second());
             return new TokenBool(!(res instanceof TokenList));
+        } else if (op.equals("eq?")) {
+            Token v1 = eval(tokenList.get(1));
+            Token v2 = eval(tokenList.get(2));
+            boolean equal = !(v1 instanceof TokenList) && v1.equals(v2);
+            return new TokenBool(equal);
         }
 
         return new TokenSymbol("Not implemented yet :)");

@@ -20,6 +20,10 @@ public class TokenList extends Token {
         return out.toString();
     }
 
+    public Token get(int index) {
+        return list.get(index);
+    }
+
     public Token first() {
         return list.get(0);
     }

@@ -26,7 +26,6 @@ public class Jisp {
                 // Read next line of input
                 String input = scanner.nextLine();
                 Token token = Parser.parse(input);
-                printToken(token);
                 Token result = global.eval(token);
                 printToken(result);
             } catch (Exception e) {

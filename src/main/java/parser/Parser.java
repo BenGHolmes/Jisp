@@ -8,7 +8,6 @@ public class Parser {
     /** Parse a Lisp string into nested arrays of tokens **/
     public static Token parse(String s) throws ParserException {
         Deque<String> tokens = tokenize(s);
-        System.out.println(tokens);
         return buildTree(tokens);
     }
 
