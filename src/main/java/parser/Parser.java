@@ -8,6 +8,7 @@ public class Parser {
     /** Parse a Lisp string into nested arrays of tokens **/
     public static Token parse(String s) throws ParserException {
         Deque<String> tokens = tokenize(s);
+        System.out.println(tokens);
         return buildTree(tokens);
     }
 
@@ -18,10 +19,10 @@ public class Parser {
     /** Split an input string into a list of individual tokens **/
     private static Deque<String> tokenize(String s) {
         return new ArrayDeque<String>(Arrays.asList(
-                s.replace("(", " ( ")
-                        .replace(")", " ) ")
-                        .trim()
-                        .split(" ")
+                s.trim()
+                    .replaceAll("\\((?=[^\\s])", "( ")
+                    .replaceAll("(?<=[^\\s])\\)", " )")
+                    .split(" ")
                 ));
     }
 
