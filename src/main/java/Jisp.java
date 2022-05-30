@@ -2,7 +2,9 @@ import environment.*;
 import parser.*;
 import tokens.Token;
 import tokens.TokenBool;
+import tokens.TokenOp;
 
+import java.util.Arrays;
 import java.util.Scanner;
 
 
@@ -45,6 +47,9 @@ public class Jisp {
         Environment env = new Environment();
         env.assign("True", new TokenBool(true));
         env.assign("False", new TokenBool(false));
+        for (String op : Arrays.asList("+","-","*","/",">","<",">=","<=","=")) {
+            env.assign(op, new TokenOp(op));
+        }
         return env;
     }
 }

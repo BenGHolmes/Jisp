@@ -2,8 +2,10 @@ package environment;
 
 import tokens.*;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class Environment {
     private HashMap<String, Token> env;
@@ -74,7 +76,9 @@ public class Environment {
             case "if" -> evalIf(tokenList);
             case "set!" -> evalSet(tokenList);
             case "define" -> evalDefine(tokenList);
-            default -> new TokenError("unrecognized command: " + op);
+            case "lambda" -> evalLambda(tokenList);
+            case "begin" -> evalBegin(tokenList);
+            default -> evalProc(tokenList);
         };
     }
 
@@ -180,5 +184,52 @@ public class Environment {
 
         env.put(var, val);
         return val;
+    }
+
+    private Token evalLambda(TokenList tokenList) {
+        Token argToken = tokenList.second();
+        List<Token> args;
+        if (argToken instanceof TokenList) {
+            args = new ArrayList<>(((TokenList) argToken).list);
+        } else {
+            args = new ArrayList<>();
+            args.add(argToken);
+        }
+
+        return new TokenLambda(tokenList.get(2), args, this);
+    }
+
+    private Token evalBegin(TokenList tokenList) {
+        Token val = new TokenError("begin must be followed by at least one expression");
+        for (Token t : tokenList.tail().list) {
+            val = eval(t);
+        }
+
+        return val;
+    }
+
+    private Token evalProc(TokenList tokenList) {
+        List<Token> exps = tokenList.list.stream().map(this::eval).collect(Collectors.toList());
+
+        // If any nested eval fails, print that error
+        if (exps.stream().anyMatch(token -> token instanceof TokenError)) {
+            for (Token t : exps) {
+                if (t instanceof TokenError) {
+                    return t;
+                }
+            }
+        }
+
+        // Get the procedure and args
+        Token proc = exps.get(0);
+        List<Token> args = exps.subList(1,exps.size());
+
+        // If procedure isn't executable throw an error
+        if (!(proc instanceof TokenFn)) {
+            String message = String.format("variable %s not executable", proc.toString());
+            return new TokenError(message);
+        }
+
+        return ((TokenFn) proc).exec(args);
     }
 }
