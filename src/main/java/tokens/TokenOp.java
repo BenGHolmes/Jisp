@@ -38,7 +38,7 @@ public class TokenOp extends TokenFn {
 
         return switch (opStr) {
             case "+" -> (isInt) ? new TokenInt((int)(v1 + v2)) : new TokenFloat(v1 + v2);
-            case "-" -> (isInt) ? new TokenInt((int)(v1 - v2)) : new TokenFloat(v1 + v2);
+            case "-" -> (isInt) ? new TokenInt((int)(v1 - v2)) : new TokenFloat(v1 - v2);
             case "*" -> (isInt) ? new TokenInt((int)(v1 * v2)) : new TokenFloat(v1 * v2);
             case "/" -> (isInt) ? new TokenInt((int)(v1 / v2)) : new TokenFloat(v1 / v2);
             case ">" -> new TokenBool(v1 > v2);

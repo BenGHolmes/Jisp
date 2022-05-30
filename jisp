@@ -3,4 +3,4 @@ set -e
 echo "Building..."
 ./gradlew build
 echo "\nAll done. Happy coding!\n"
-java -cp build/classes/java/main/ Jisp   
+java -cp build/classes/java/main/ Jisp "$@"  

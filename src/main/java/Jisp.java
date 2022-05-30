@@ -4,24 +4,46 @@ import tokens.Token;
 import tokens.TokenBool;
 import tokens.TokenOp;
 
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Scanner;
+import java.util.stream.Collectors;
 
 
 /**
  * Command line Lisp interpreter.
  */
 public class Jisp {
-    public static void main(String[] args) {
-        // TODO: If file given, load that first
+    public static Environment global;
 
+    public static void main(String[] args) {
+        global =  createGlobalEnv();
+
+        if (args.length > 0) {
+            System.out.println("Loading and executing startup scripts:");
+            for (String filename : args) {
+                try {
+                    for (String line : Files.lines(Paths.get(filename)).collect(Collectors.toList())) {
+                        Token token = Parser.parse(line);
+                        global.eval(token);
+                    }
+
+                    System.out.printf("    [x] %s\n", filename);
+                } catch (Exception e) {
+                    System.out.printf("Failed to read file %s\n", filename);
+                    e.printStackTrace();
+                }
+            }
+        }
+
+        System.out.println();
         promptLoop();
     }
 
     /** Infinite prompt-read-eval-print loop for the interpreter. **/
     private static void promptLoop() {
         Scanner scanner = new Scanner(System.in);
-        Environment global = createGlobalEnv();
 
         while (true) {
             System.out.print("jisp> ");
